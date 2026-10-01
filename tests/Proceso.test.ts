@@ -86,6 +86,49 @@ describe('Proceso', () => {
 
     expect(() => proceso.ejecutarTick()).toThrow();
   });
+  
+  it('necesita CPU mientras le quede, y deja de necesitarla al consumirla toda', () => {
+    const proceso = new Proceso(1, 100, 2);
+    proceso.admitir();
+    proceso.despachar();
+
+    expect(proceso.necesitaCpu()).toBe(true);
+    proceso.ejecutarTick();
+    proceso.ejecutarTick();
+
+    expect(proceso.necesitaCpu()).toBe(false);
+  });
+
+  it('pasa a TERMINADO cuando consumió toda su CPU', () => {
+    const proceso = new Proceso(1, 100, 2);
+    proceso.admitir();
+    proceso.despachar();
+    proceso.ejecutarTick();
+    proceso.ejecutarTick();
+
+    proceso.terminar();
+
+    expect(proceso.estado).toBe(EstadoProceso.TERMINADO);
+  });
+
+  it('no puede terminar si todavía le queda CPU', () => {
+    const proceso = new Proceso(1, 100, 2);
+    proceso.admitir();
+    proceso.despachar();
+    proceso.ejecutarTick();
+
+    expect(() => proceso.terminar()).toThrow();
+  });
+
+  it('no puede ejecutar un tick si ya no le queda CPU', () => {
+    const proceso = new Proceso(1, 100, 2);
+    proceso.admitir();
+    proceso.despachar();
+    proceso.ejecutarTick();
+    proceso.ejecutarTick();
+
+    expect(() => proceso.ejecutarTick()).toThrow();
+  });
 });
 
 

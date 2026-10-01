@@ -13,6 +13,7 @@ export class Proceso implements IProceso {
     this.validarEnteroPositivo(pid, 'PID');
     this.validarEnteroPositivo(memoriaRequerida, 'Memoria requerida');
     this.validarEnteroPositivo(tiempoCpuTotal, 'Tiempo de CPU total');
+
     this._pid = pid;
     this._memoriaRequerida = memoriaRequerida;
     this._tiempoCpuTotal = tiempoCpuTotal;
@@ -41,43 +42,56 @@ export class Proceso implements IProceso {
     return this._estado;
   }
 
- get quantumConsumido(): number {
+  get quantumConsumido(): number {
     return this._quantumConsumido;
   }
 
+  necesitaCpu(): boolean {
+    return this._tiempoCpuRestante > 0;
+  }
+
   esperarMemoria(): void {
-    if (this._estado !== EstadoProceso.NUEVO) {
-      throw new Error(`No se puede poner a esperar memoria al proceso ${this._pid} en estado ${this._estado}`);
-    }
+    this.validarEstado([EstadoProceso.NUEVO], 'poner a esperar memoria');
     this._estado = EstadoProceso.ESPERANDO_MEMORIA;
   }
 
   admitir(): void {
-    if (this._estado !== EstadoProceso.NUEVO && this._estado !== EstadoProceso.ESPERANDO_MEMORIA) {
-      throw new Error(`No se puede admitir el proceso ${this._pid} en estado ${this._estado}`);
-    }
+    this.validarEstado([EstadoProceso.NUEVO, EstadoProceso.ESPERANDO_MEMORIA], 'admitir');
     this._estado = EstadoProceso.LISTO;
   }
 
   despachar(): void {
-    if (this._estado !== EstadoProceso.LISTO) {
-      throw new Error(`No se puede despachar el proceso ${this._pid} en estado ${this._estado}`);
-    }
+    this.validarEstado([EstadoProceso.LISTO], 'despachar');
     this._estado = EstadoProceso.EJECUTANDO;
     this._quantumConsumido = 0;
   }
 
   ejecutarTick(): void {
-    if (this._estado !== EstadoProceso.EJECUTANDO) {
-      throw new Error(`El proceso ${this._pid} no puede ejecutar en estado ${this._estado}`);
+    this.validarEstado([EstadoProceso.EJECUTANDO], 'ejecutar');
+    if (!this.necesitaCpu()) {
+      throw new Error(`El proceso ${this._pid} ya no tiene CPU restante`);
     }
     this._tiempoCpuRestante--;
     this._quantumConsumido++;
   }
 
-private validarEnteroPositivo(valor: number, nombre: string): void {
+  terminar(): void {
+    this.validarEstado([EstadoProceso.EJECUTANDO], 'terminar');
+    if (this.necesitaCpu()) {
+      throw new Error(`El proceso ${this._pid} todavía necesita ${this._tiempoCpuRestante} ticks de CPU`);
+    }
+    this._estado = EstadoProceso.TERMINADO;
+  }
+
+  private validarEnteroPositivo(valor: number, nombre: string): void {
     if (!Number.isInteger(valor) || valor <= 0) {
       throw new Error(`${nombre} debe ser un entero positivo`);
+    }
+  }
+
+  private validarEstado(permitidos: EstadoProceso[], accion: string): void {
+    if (!permitidos.includes(this._estado)) {
+      throw new Error(`No se puede ${accion} el proceso ${this._pid} en estado ${this._estado}`);
     }
   }
 }

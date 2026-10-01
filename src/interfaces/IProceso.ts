@@ -6,9 +6,13 @@ export interface IProceso {
   readonly tiempoCpuTotal: number;
   readonly tiempoCpuRestante: number;
   readonly estado: EstadoProceso;
+  readonly quantumConsumido: number;
+
+necesitaCpu(): boolean;
 
 esperarMemoria(): void;
 admitir(): void;
 despachar(): void;                
+
 ejecutarTick(): void;     
 }
