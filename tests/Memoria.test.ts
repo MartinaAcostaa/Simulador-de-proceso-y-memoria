@@ -127,5 +127,33 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
       { inicio: 300, tamanio: 724, pid: null },
     ]);
   });
+  
+  it('fusiona con los dos vecinos a la vez', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+    memoria.asignar(2, 100);
+    memoria.asignar(3, 100);
+    memoria.liberar(1);       
+    memoria.liberar(3);      
+
+    memoria.liberar(2);
+
+    expect(memoria.obtenerMapa()).toEqual([{ inicio: 0, tamanio: 1024, pid: null }]);
+  });
+
+  it('al liberar todos los procesos queda un único bloque libre y se puede reutilizar', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 300);
+    memoria.asignar(2, 200);
+    memoria.asignar(3, 524);
+    expect(memoria.asignar(4, 100)).toBe(false);  
+
+    memoria.liberar(2);
+    memoria.liberar(1);
+    memoria.liberar(3);
+
+    expect(memoria.obtenerMapa()).toEqual([{ inicio: 0, tamanio: 1024, pid: null }]);
+    expect(memoria.asignar(4, 100)).toBe(true);
+  });
 });
 }); 
