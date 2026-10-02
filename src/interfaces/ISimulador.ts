@@ -7,6 +7,7 @@ export interface ISimulador {
   registrarProceso(proceso: IProceso): void;
   obtenerEstado(pid: number): EstadoProceso;
   ejecutarTick(): void;
+  obtenerPidsEsperandoMemoria(): number[];
   obtenerPidsListos(): number[];
   obtenerMapaMemoria(): InfoBloque[];
 }

@@ -82,4 +82,16 @@ describe('Simulador - fase 1: admisión', () => {
       { inicio: 500, tamanio: 500, pid: null },
     ]);
   });
+  
+  it('el que no entra queda esperando memoria y se reintenta en cada tick', () => {
+    const simulador = crearSimulador(1000);
+    simulador.registrarProceso(new Proceso(1, 600, 5));
+    simulador.registrarProceso(new Proceso(2, 600, 5));
+
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+
+    expect(simulador.obtenerEstado(2)).toBe(EstadoProceso.ESPERANDO_MEMORIA);
+    expect(simulador.obtenerPidsEsperandoMemoria()).toEqual([2]);
+  });
 });

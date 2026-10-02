@@ -33,6 +33,10 @@ export class Simulador implements ISimulador {
     this._reloj++;
   }
 
+  obtenerPidsEsperandoMemoria(): number[] {
+    return this.filtrarPorEstado(EstadoProceso.ESPERANDO_MEMORIA).map((p) => p.pid);
+  }
+
   obtenerPidsListos(): number[] {
     return this._planificador.obtenerPidsListos();
   }
@@ -40,7 +44,7 @@ export class Simulador implements ISimulador {
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
   }
-  
+
   private admitirProcesos(): void {
     this._procesos
       .filter((p) => p.estado === EstadoProceso.NUEVO || p.estado === EstadoProceso.ESPERANDO_MEMORIA)
@@ -51,7 +55,13 @@ export class Simulador implements ISimulador {
     if (this._memoria.asignar(proceso.pid, proceso.memoriaRequerida)) {
       proceso.admitir();
       this._planificador.agregarListo(proceso);
+    } else if (proceso.estado === EstadoProceso.NUEVO) {
+      proceso.esperarMemoria();
     }
+  }
+
+  private filtrarPorEstado(estado: EstadoProceso): IProceso[] {
+    return this._procesos.filter((p) => p.estado === estado);
   }
 
   private validarRegistro(proceso: IProceso): void {
