@@ -48,4 +48,33 @@ describe('PlanificadorRoundRobin - creación', () => {
     expect(() => planificador.agregarListo(proceso)).toThrow();
   });
 });
+
+describe('PlanificadorRoundRobin - tomar el siguiente', () => {
+  it('entrega el primero de la cola y lo saca', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+    planificador.agregarListo(crearListo(1));
+    planificador.agregarListo(crearListo(2));
+
+    const siguiente = planificador.tomarSiguiente();
+
+    expect(siguiente.pid).toBe(1);
+    expect(planificador.obtenerPidsListos()).toEqual([2]);
+  });
+
+  it('un proceso que vuelve a la cola queda último (rotación)', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+    planificador.agregarListo(crearListo(1));
+    planificador.agregarListo(crearListo(2));
+
+    planificador.agregarListo(planificador.tomarSiguiente());
+
+    expect(planificador.obtenerPidsListos()).toEqual([2, 1]);
+  });
+
+  it('da error si no hay procesos listos', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+
+    expect(() => planificador.tomarSiguiente()).toThrow();
+  });
+});
 });

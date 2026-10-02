@@ -5,4 +5,5 @@ export interface IPlanificador {
   hayListos(): boolean;
   obtenerPidsListos(): number[];
   agregarListo(proceso: IProceso): void;
+   tomarSiguiente(): IProceso;
 }

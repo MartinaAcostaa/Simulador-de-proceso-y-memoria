@@ -23,7 +23,7 @@ export class PlanificadorRoundRobin implements IPlanificador {
   obtenerPidsListos(): number[] {
     return this._colaListos.map((proceso) => proceso.pid);
   }
-  
+
     agregarListo(proceso: IProceso): void {
     if (proceso.estado !== EstadoProceso.LISTO) {
       throw new Error(`El proceso ${proceso.pid} no está LISTO`);
@@ -32,5 +32,12 @@ export class PlanificadorRoundRobin implements IPlanificador {
       throw new Error(`El proceso ${proceso.pid} ya está en la cola de listos`);
     }
     this._colaListos.push(proceso);
+  }
+    tomarSiguiente(): IProceso {
+    const siguiente = this._colaListos.shift();
+    if (siguiente === undefined) {
+      throw new Error('No hay procesos listos para despachar');
+    }
+    return siguiente;
   }
 }
