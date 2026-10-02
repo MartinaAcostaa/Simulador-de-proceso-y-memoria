@@ -42,6 +42,14 @@ export class Memoria implements IMemoria {
     return this._bloques.some((bloque) => bloque.pid === pid);
   }
 
+  liberar(pid: number): void {
+    const indice = this._bloques.findIndex((bloque) => bloque.pid === pid);
+    if (indice === -1) {
+      throw new Error(`El proceso ${pid} no tiene memoria asignada`);
+    }
+    (this._bloques[indice] as BloqueMemoria).liberar();
+  }
+
   obtenerMapa(): InfoBloque[] {
     return this._bloques.map((bloque) => ({ inicio: bloque.inicio, tamanio: bloque.tamanio, pid: bloque.pid }));
   }

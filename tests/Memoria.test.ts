@@ -74,4 +74,29 @@ describe('Memoria: asignación (RF04)', () => {
     expect(() => memoria.asignar(1, 0)).toThrow();
   });
 });
+
+describe('Memoria: liberación y coalescencia (RF05)', () => {
+  it('libera el bloque de un proceso; si los vecinos están ocupados no fusiona', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+    memoria.asignar(2, 100);
+    memoria.asignar(3, 100);
+
+    memoria.liberar(2);
+
+    expect(memoria.tieneAsignado(2)).toBe(false);
+    expect(memoria.obtenerMapa()).toEqual([
+      { inicio: 0, tamanio: 100, pid: 1 },
+      { inicio: 100, tamanio: 100, pid: null },
+      { inicio: 200, tamanio: 100, pid: 3 },
+      { inicio: 300, tamanio: 724, pid: null },
+    ]);
+  });
+
+  it('rechaza liberar un proceso que no tiene memoria', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+
+    expect(() => memoria.liberar(9)).toThrow();
+  });
+});
 }); 
