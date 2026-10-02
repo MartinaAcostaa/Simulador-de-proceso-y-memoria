@@ -5,5 +5,7 @@ export interface IPlanificador {
   hayListos(): boolean;
   obtenerPidsListos(): number[];
   agregarListo(proceso: IProceso): void;
-   tomarSiguiente(): IProceso;
+  tomarSiguiente(): IProceso;
+  debeExpropiar(proceso: IProceso): boolean;
+  debeRenovarQuantum(proceso: IProceso): boolean;
 }

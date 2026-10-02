@@ -40,4 +40,12 @@ export class PlanificadorRoundRobin implements IPlanificador {
     }
     return siguiente;
   }
+
+    debeExpropiar(proceso: IProceso): boolean {
+    return proceso.agotoQuantum(this._quantum) && this.hayListos();
+  }
+
+  debeRenovarQuantum(proceso: IProceso): boolean {
+    return proceso.agotoQuantum(this._quantum) && !this.hayListos();
+  }
 }

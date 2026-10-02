@@ -77,4 +77,40 @@ describe('PlanificadorRoundRobin - tomar el siguiente', () => {
     expect(() => planificador.tomarSiguiente()).toThrow();
   });
 });
+
+describe('PlanificadorRoundRobin - fin de quantum', () => {
+  function crearEjecutando(pid: number, ticks: number): Proceso {
+    const proceso = crearListo(pid);
+    proceso.despachar();
+    for (let i = 0; i < ticks; i++) proceso.ejecutarTick();
+    return proceso;
+  }
+  
+
+  it('si no agotó el quantum, no expropia ni renueva', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+    planificador.agregarListo(crearListo(2));
+    const enCpu = crearEjecutando(1, 1);
+
+    expect(planificador.debeExpropiar(enCpu)).toBe(false);
+    expect(planificador.debeRenovarQuantum(enCpu)).toBe(false);
+  });
+
+  it('si agotó el quantum y hay otros listos, expropia', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+    planificador.agregarListo(crearListo(2));
+    const enCpu = crearEjecutando(1, 2);
+
+    expect(planificador.debeExpropiar(enCpu)).toBe(true);
+    expect(planificador.debeRenovarQuantum(enCpu)).toBe(false);
+  });
+
+  it('si agotó el quantum y no hay otros listos, renueva sin cambio de contexto', () => {
+    const planificador = new PlanificadorRoundRobin(2);
+    const enCpu = crearEjecutando(1, 2);
+
+    expect(planificador.debeExpropiar(enCpu)).toBe(false);
+    expect(planificador.debeRenovarQuantum(enCpu)).toBe(true);
+  });
+});
 });
