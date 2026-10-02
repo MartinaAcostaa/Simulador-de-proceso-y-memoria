@@ -17,4 +17,6 @@ export interface IMemoria {
   calcularMemoriaLibre(): number;
   calcularMemoriaOcupada(): number;
   calcularOcupacion(): number;
+  calcularMayorBloqueLibre(): number;
+  calcularFragmentacionExterna(): number;
 }

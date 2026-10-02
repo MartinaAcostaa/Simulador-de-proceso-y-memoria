@@ -210,5 +210,31 @@ describe('Memoria: métricas (RF09)', () => {
     expect(memoria.calcularMemoriaLibre()).toBe(0);
     expect(memoria.calcularOcupacion()).toBe(100);
   });
+  
+  it('huecos no contiguos de 100 y 300 KB: libre 400, mayor 300 y fragmentación 25%', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+    memoria.asignar(2, 200);
+    memoria.asignar(3, 300);
+    memoria.asignar(4, 424);  
+    memoria.liberar(1);        
+    memoria.liberar(3);       
+
+    expect(memoria.calcularMemoriaLibre()).toBe(400);
+    expect(memoria.calcularMayorBloqueLibre()).toBe(300);
+    expect(memoria.calcularFragmentacionExterna()).toBe(25);
+    expect(memoria.calcularOcupacion()).toBeCloseTo(60.94, 2);
+  });
+
+  it('sin fragmentación con un solo hueco, y 0% con la memoria llena', () => {
+    const vacia = new Memoria(1024, new FirstFit());
+    const llena = new Memoria(1024, new FirstFit());
+    llena.asignar(1, 1024);
+
+    expect(vacia.calcularMayorBloqueLibre()).toBe(1024);
+    expect(vacia.calcularFragmentacionExterna()).toBe(0);
+    expect(llena.calcularMayorBloqueLibre()).toBe(0);
+    expect(llena.calcularFragmentacionExterna()).toBe(0);
+  });
 });
 });

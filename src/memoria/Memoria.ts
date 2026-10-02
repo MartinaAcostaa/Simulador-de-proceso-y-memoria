@@ -67,6 +67,18 @@ export class Memoria implements IMemoria {
     return (100 * this.calcularMemoriaOcupada()) / this._tamanioTotal;
   }
 
+  calcularMayorBloqueLibre(): number {
+    return Math.max(0, ...this.obtenerBloquesLibres().map((bloque) => bloque.tamanio));
+  }
+
+  calcularFragmentacionExterna(): number {
+    const libre = this.calcularMemoriaLibre();
+    if (libre === 0) {
+      return 0;
+    }
+    return 100 * (1 - this.calcularMayorBloqueLibre() / libre);
+  }
+
   private ocuparBloque(indice: number, pid: number, tamanio: number): void {
     const elegido = this._bloques[indice] as BloqueMemoria;
     if (elegido.tamanio === tamanio) {
