@@ -34,7 +34,7 @@ describe('Simulador - registro de procesos', () => {
     expect(() => simulador.obtenerEstado(99)).toThrow();
   });
 
-    it('no acepta dos procesos con el mismo PID', () => {
+  it('no acepta dos procesos con el mismo PID', () => {
     const simulador = crearSimulador();
     simulador.registrarProceso(new Proceso(1, 100, 5));
 

@@ -30,6 +30,7 @@ export class Simulador implements ISimulador {
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
   }
+
   private validarRegistro(proceso: IProceso): void {
     if (proceso.estado !== EstadoProceso.NUEVO) {
       throw new Error(`El proceso ${proceso.pid} tiene que estar en estado NUEVO`);
