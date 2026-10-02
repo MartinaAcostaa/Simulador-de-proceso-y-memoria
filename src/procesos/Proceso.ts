@@ -50,6 +50,11 @@ export class Proceso implements IProceso {
     return this._tiempoCpuRestante > 0;
   }
 
+  agotoQuantum(quantum: number): boolean {
+    this.validarEnteroPositivo(quantum, 'Quantum');
+    return this._quantumConsumido >= quantum;
+  }
+
   esperarMemoria(): void {
     this.validarEstado([EstadoProceso.NUEVO], 'poner a esperar memoria');
     this._estado = EstadoProceso.ESPERANDO_MEMORIA;
@@ -66,6 +71,11 @@ export class Proceso implements IProceso {
     this._quantumConsumido = 0;
   }
 
+  expropiar(): void {
+    this.validarEstado([EstadoProceso.EJECUTANDO], 'expropiar');
+    this._estado = EstadoProceso.LISTO;
+  }
+
   ejecutarTick(): void {
     this.validarEstado([EstadoProceso.EJECUTANDO], 'ejecutar');
     if (!this.necesitaCpu()) {
@@ -73,6 +83,11 @@ export class Proceso implements IProceso {
     }
     this._tiempoCpuRestante--;
     this._quantumConsumido++;
+  }
+
+  renovarQuantum(): void {
+    this.validarEstado([EstadoProceso.EJECUTANDO], 'renovar el quantum de');
+    this._quantumConsumido = 0;
   }
 
   terminar(): void {

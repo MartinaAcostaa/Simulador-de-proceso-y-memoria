@@ -9,10 +9,16 @@ export interface IProceso {
   readonly quantumConsumido: number;
 
 necesitaCpu(): boolean;
+agotoQuantum(quantum: number): boolean;
 
 esperarMemoria(): void;
 admitir(): void;
-despachar(): void;                
+despachar(): void; 
+expropiar(): void;
+terminar(): void;
 
-ejecutarTick(): void;     
+
+ejecutarTick(): void;
+renovarQuantum(): void;
 }
+

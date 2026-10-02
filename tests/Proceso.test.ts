@@ -129,6 +129,75 @@ describe('Proceso', () => {
 
     expect(() => proceso.ejecutarTick()).toThrow();
   });
+  
+  it('guarda el PID, la memoria requerida y el tiempo de CPU total', () => {
+    const proceso = new Proceso(7, 256, 4);
+
+    expect(proceso.pid).toBe(7);
+    expect(proceso.memoriaRequerida).toBe(256);
+    expect(proceso.tiempoCpuTotal).toBe(4);
+  });
+
+  it('agota el quantum cuando consumió tantos ticks como el quantum', () => {
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();
+    proceso.despachar();
+
+    proceso.ejecutarTick();
+    expect(proceso.agotoQuantum(2)).toBe(false);   // consumió 1 de 2
+
+    proceso.ejecutarTick();
+    expect(proceso.agotoQuantum(2)).toBe(true);    // consumió 2 de 2
+  });
+
+  it('rechaza un quantum que no sea entero positivo', () => {
+    const proceso = new Proceso(1, 100, 5);
+
+    expect(() => proceso.agotoQuantum(0)).toThrow();
+    expect(() => proceso.agotoQuantum(-2)).toThrow();
+    expect(() => proceso.agotoQuantum(1.5)).toThrow();
+  });
+
+  it('vuelve a LISTO al ser expropiado', () => {
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();
+    proceso.despachar();
+    proceso.ejecutarTick();
+    proceso.ejecutarTick();
+
+    proceso.expropiar();
+
+    expect(proceso.estado).toBe(EstadoProceso.LISTO);
+    expect(proceso.tiempoCpuRestante).toBe(3);   // no pierde lo que ya avanzó
+  });
+
+  it('no puede ser expropiado si no está EJECUTANDO', () => {
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();   // está LISTO
+
+    expect(() => proceso.expropiar()).toThrow();
+  });
+
+  it('al renovar el quantum sigue EJECUTANDO con el quantum en 0', () => {
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();
+    proceso.despachar();
+    proceso.ejecutarTick();
+    proceso.ejecutarTick();
+
+    proceso.renovarQuantum();
+
+    expect(proceso.estado).toBe(EstadoProceso.EJECUTANDO);
+    expect(proceso.quantumConsumido).toBe(0);
+    expect(proceso.tiempoCpuRestante).toBe(3);   // renovar NO devuelve CPU
+  });
+
+  it('no puede renovar el quantum si no está EJECUTANDO', () => {
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();
+
+    expect(() => proceso.renovarQuantum()).toThrow();
+  });
 });
 
 
