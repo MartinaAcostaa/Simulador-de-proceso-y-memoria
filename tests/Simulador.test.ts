@@ -183,3 +183,28 @@ describe('Simulador - fase 2: Entrada/Salida', () => {
     expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.TERMINADO);
   });
 });
+
+describe('Simulador - fase 4: métricas y fin de la simulación', () => {
+  it('el uso de CPU es 0 % en el tick 0 y después el porcentaje de ticks ocupados', () => {
+    const simulador = crearSimulador();
+    expect(simulador.calcularUsoCpu()).toBe(0);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+
+    for (let i = 0; i < 4; i++) simulador.ejecutarTick();
+
+    expect(simulador.calcularUsoCpu()).toBe(75);
+  });
+
+  it('ejecuta hasta que todos los procesos terminan', () => {
+    const simulador = crearSimulador(1000, 2);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+    simulador.registrarProceso(new Proceso(2, 100, 2));
+    expect(simulador.haTerminado()).toBe(false);
+
+    simulador.ejecutarHastaTerminar();
+
+    expect(simulador.haTerminado()).toBe(true);
+    expect(simulador.reloj).toBe(5);
+    expect(simulador.calcularFragmentacionExterna()).toBe(0);
+  });
+});

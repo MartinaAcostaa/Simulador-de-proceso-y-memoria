@@ -39,12 +39,24 @@ export class Simulador implements ISimulador {
   obtenerEstado(pid: number): EstadoProceso {
     return this.buscarProceso(pid).estado;
   }
-
+  
   ejecutarTick(): void {
     this.admitirProcesos();
     this.avanzarEntradaSalida();
-    this._historialCpu.push(this.ejecutarCpu());
+    const pidEjecutado = this.ejecutarCpu();
+    this._historialCpu.push(pidEjecutado);
+    this._metricas.registrarTick(pidEjecutado !== null);
     this._reloj++;
+  }
+  
+  ejecutarHastaTerminar(): void {
+    while (!this.haTerminado()) {
+      this.ejecutarTick();
+    }
+  }
+
+  haTerminado(): boolean {
+    return this._procesos.every((p) => p.estado === EstadoProceso.TERMINADO);
   }
 
   obtenerPidsEsperandoMemoria(): number[] {
@@ -69,6 +81,14 @@ export class Simulador implements ISimulador {
 
   obtenerCambiosContexto(): number {
     return this._metricas.cambiosContexto;
+  }
+  
+  calcularUsoCpu(): number {
+    return this._metricas.calcularUsoCpu();
+  }
+
+  calcularFragmentacionExterna(): number {
+    return this._memoria.calcularFragmentacionExterna();
   }
 
   private admitirProcesos(): void {

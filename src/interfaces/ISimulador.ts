@@ -8,10 +8,14 @@ export interface ISimulador {
   registrarProceso(proceso: IProceso): void;
   obtenerEstado(pid: number): EstadoProceso;
   ejecutarTick(): void;
+  ejecutarHastaTerminar(): void;
+  haTerminado(): boolean;
   obtenerPidsEsperandoMemoria(): number[];
   obtenerPidsListos(): number[];
   obtenerPidsBloqueados(): number[];
   obtenerMapaMemoria(): InfoBloque[];
   obtenerHistorialCpu(): (number | null)[];
   obtenerCambiosContexto(): number;
+  calcularUsoCpu(): number;
+  calcularFragmentacionExterna(): number;
 }
