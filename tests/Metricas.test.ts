@@ -19,8 +19,9 @@ describe('Metricas - ticks', () => {
     expect(metricas.ticksTotales).toBe(3);
     expect(metricas.ticksCpuOcupada).toBe(2);
   });
+});
 
-  describe('Metricas - uso de CPU', () => {
+describe('Metricas - uso de CPU', () => {
   it('es 0 % si todavía no pasó ningún tick', () => {
     expect(new Metricas().calcularUsoCpu()).toBe(0);
   });
@@ -46,5 +47,4 @@ describe('Metricas - cambios de contexto', () => {
 
     expect(metricas.cambiosContexto).toBe(2);
   });
-});
 });
