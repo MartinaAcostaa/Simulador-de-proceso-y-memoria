@@ -48,6 +48,7 @@ export class Memoria implements IMemoria {
       throw new Error(`El proceso ${pid} no tiene memoria asignada`);
     }
     (this._bloques[indice] as BloqueMemoria).liberar();
+    this.coalescer(indice);
   }
 
   obtenerMapa(): InfoBloque[] {
@@ -64,5 +65,23 @@ export class Memoria implements IMemoria {
     ocupado.ocupar(pid);
     const resto = new BloqueMemoria(elegido.inicio + tamanio, elegido.tamanio - tamanio);
     this._bloques.splice(indice, 1, ocupado, resto);
+  }
+  
+  private coalescer(indice: number): void {
+    const derecho = this._bloques[indice + 1];
+    if (derecho !== undefined && derecho.estaLibre()) {
+      this.fusionarConSiguiente(indice);
+    }
+    const izquierdo = this._bloques[indice - 1];
+    if (izquierdo !== undefined && izquierdo.estaLibre()) {
+      this.fusionarConSiguiente(indice - 1);
+    }
+  }
+
+  private fusionarConSiguiente(indice: number): void {
+    const primero = this._bloques[indice] as BloqueMemoria;
+    const segundo = this._bloques[indice + 1] as BloqueMemoria;
+    const fusionado = new BloqueMemoria(primero.inicio, primero.tamanio + segundo.tamanio);
+    this._bloques.splice(indice, 2, fusionado);
   }
 }

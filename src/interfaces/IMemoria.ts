@@ -11,6 +11,6 @@ export interface IMemoria {
   obtenerMapa(): InfoBloque[];
   asignar(pid: number, tamanio: number): boolean;
   tieneAsignado(pid: number): boolean;
-   liberar(pid: number): void;
+  liberar(pid: number): void;
 }
 

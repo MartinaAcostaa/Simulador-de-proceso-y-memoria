@@ -98,5 +98,34 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
 
     expect(() => memoria.liberar(9)).toThrow();
   });
+  
+  it('fusiona con el vecino derecho libre', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+    memoria.asignar(2, 100);   
+
+    memoria.liberar(2);
+
+    expect(memoria.obtenerMapa()).toEqual([
+      { inicio: 0, tamanio: 100, pid: 1 },
+      { inicio: 100, tamanio: 924, pid: null },
+    ]);
+  });
+
+  it('fusiona con el vecino izquierdo libre', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+    memoria.asignar(2, 100);
+    memoria.asignar(3, 100);
+    memoria.liberar(1);       
+
+    memoria.liberar(2);
+
+    expect(memoria.obtenerMapa()).toEqual([
+      { inicio: 0, tamanio: 200, pid: null },
+      { inicio: 200, tamanio: 100, pid: 3 },
+      { inicio: 300, tamanio: 724, pid: null },
+    ]);
+  });
 });
 }); 
