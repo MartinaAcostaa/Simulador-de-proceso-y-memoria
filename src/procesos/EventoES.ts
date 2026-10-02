@@ -20,4 +20,8 @@ export class EventoES implements IEventoES {
   get duracion(): number {
     return this._duracion;
   }
-}
+} 
+
+
+
+

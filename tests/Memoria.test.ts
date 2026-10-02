@@ -49,5 +49,29 @@ describe('Memoria: asignación (RF04)', () => {
     expect(memoria.obtenerMapa()).toEqual(antes);
     expect(memoria.tieneAsignado(2)).toBe(false);
   });
+  
+  it('divide el bloque cuando sobra espacio', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+
+    memoria.asignar(1, 100);
+
+    expect(memoria.obtenerMapa()).toEqual([
+      { inicio: 0, tamanio: 100, pid: 1 },
+      { inicio: 100, tamanio: 924, pid: null },
+    ]);
+  });
+
+  it('rechaza asignar dos veces al mismo proceso', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 100);
+
+    expect(() => memoria.asignar(1, 50)).toThrow();
+  });
+
+  it('rechaza un tamaño pedido inválido', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+
+    expect(() => memoria.asignar(1, 0)).toThrow();
+  });
 });
 }); 

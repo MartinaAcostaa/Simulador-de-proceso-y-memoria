@@ -25,11 +25,16 @@ export class Memoria implements IMemoria {
   }
 
   asignar(pid: number, tamanio: number): boolean {
+    validarEnteroPositivo(tamanio, 'El tamaño pedido');
+    if (this.tieneAsignado(pid)) {
+      throw new Error(`El proceso ${pid} ya tiene memoria asignada`);
+    }
+
     const indice = this._estrategia.elegirBloque(this._bloques, tamanio);
     if (indice === -1) {
       return false;
     }
-    this.ocuparBloque(indice, pid);
+    this.ocuparBloque(indice, pid, tamanio);
     return true;
   }
 
@@ -41,8 +46,15 @@ export class Memoria implements IMemoria {
     return this._bloques.map((bloque) => ({ inicio: bloque.inicio, tamanio: bloque.tamanio, pid: bloque.pid }));
   }
 
-  private ocuparBloque(indice: number, pid: number): void {
+  private ocuparBloque(indice: number, pid: number, tamanio: number): void {
     const elegido = this._bloques[indice] as BloqueMemoria;
-    elegido.ocupar(pid);
+    if (elegido.tamanio === tamanio) {
+      elegido.ocupar(pid);  
+      return;
+    }
+    const ocupado = new BloqueMemoria(elegido.inicio, tamanio);
+    ocupado.ocupar(pid);
+    const resto = new BloqueMemoria(elegido.inicio + tamanio, elegido.tamanio - tamanio);
+    this._bloques.splice(indice, 1, ocupado, resto);
   }
 }
