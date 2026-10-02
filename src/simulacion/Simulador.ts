@@ -2,11 +2,14 @@ import { ISimulador } from '../interfaces/ISimulador';
 import { IMemoria, InfoBloque } from '../interfaces/IMemoria';
 import { IPlanificador } from '../interfaces/IPlanificador';
 import { IProceso } from '../interfaces/IProceso';
+import { IMetricas } from '../interfaces/IMetricas';
 import { EstadoProceso } from '../procesos/EstadoProceso';
+import { Metricas } from './Metricas';
 
 export class Simulador implements ISimulador {
   private readonly _memoria: IMemoria;
   private readonly _planificador: IPlanificador;
+  private readonly _metricas: IMetricas = new Metricas();
   private readonly _procesos: IProceso[] = [];
   private readonly _historialCpu: (number | null)[] = [];
   private _reloj = 0;
@@ -56,6 +59,10 @@ export class Simulador implements ISimulador {
     return [...this._historialCpu];
   }
 
+  obtenerCambiosContexto(): number {
+    return this._metricas.cambiosContexto;
+  }
+
   private admitirProcesos(): void {
     this._procesos
       .filter((p) => p.estado === EstadoProceso.NUEVO || p.estado === EstadoProceso.ESPERANDO_MEMORIA)
@@ -87,7 +94,18 @@ export class Simulador implements ISimulador {
   private resolverFinDeTick(proceso: IProceso): void {
     if (!proceso.necesitaCpu()) {
       this.terminarProceso(proceso);
+    } else if (this._planificador.debeExpropiar(proceso)) {
+      this.expropiarProceso(proceso);
+    } else if (this._planificador.debeRenovarQuantum(proceso)) {
+      proceso.renovarQuantum();
     }
+  }
+
+  private expropiarProceso(proceso: IProceso): void {
+    proceso.expropiar();
+    this._planificador.agregarListo(proceso);
+    this._metricas.registrarCambioContexto();
+    this._enCpu = null;
   }
 
   private terminarProceso(proceso: IProceso): void {

@@ -133,3 +133,26 @@ describe('Simulador - fase 3: CPU', () => {
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 2, null]);
   });
 });
+
+describe('Simulador - Round-Robin', () => {
+  it('al agotar el quantum con otros listos, expropia y cuenta un cambio de contexto', () => {
+    const simulador = crearSimulador(1000, 2);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+    simulador.registrarProceso(new Proceso(2, 100, 3));
+
+    for (let i = 0; i < 6; i++) simulador.ejecutarTick();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 2, 2, 1, 2]);
+    expect(simulador.obtenerCambiosContexto()).toBe(2);
+  });
+
+  it('al agotar el quantum sin otros listos, renueva sin cambio de contexto', () => {
+    const simulador = crearSimulador(1000, 1);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+
+    for (let i = 0; i < 3; i++) simulador.ejecutarTick();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 1]);
+    expect(simulador.obtenerCambiosContexto()).toBe(0);
+  });
+});
