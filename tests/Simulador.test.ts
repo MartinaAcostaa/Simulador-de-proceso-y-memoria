@@ -5,6 +5,7 @@ import { FirstFit } from '../src/memoria/FirstFit';
 import { PlanificadorRoundRobin } from '../src/planificacion/PlanificadorRoundRobin';
 import { Proceso } from '../src/procesos/Proceso';
 import { EstadoProceso } from '../src/procesos/EstadoProceso';
+import { EventoES } from '../src/procesos/EventoES';
 
 function crearSimulador(memoria = 1000, quantum = 2): Simulador {
   return new Simulador(new Memoria(memoria, new FirstFit()), new PlanificadorRoundRobin(quantum));
@@ -154,5 +155,31 @@ describe('Simulador - Round-Robin', () => {
 
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 1]);
     expect(simulador.obtenerCambiosContexto()).toBe(0);
+  });
+});
+
+describe('Simulador - fase 2: Entrada/Salida', () => {
+  it('bloquea al proceso en su E/S, conserva su memoria y cuenta un cambio de contexto', () => {
+    const simulador = crearSimulador(1000, 3);
+    simulador.registrarProceso(new Proceso(1, 100, 3, new EventoES(1, 2)));
+    simulador.registrarProceso(new Proceso(2, 100, 2));
+
+    simulador.ejecutarTick();
+
+    expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.BLOQUEADO);
+    expect(simulador.obtenerPidsBloqueados()).toEqual([1]);
+    expect(simulador.obtenerMapaMemoria()[0]).toEqual({ inicio: 0, tamanio: 100, pid: 1 });
+    expect(simulador.obtenerCambiosContexto()).toBe(1);
+  });
+
+  it('al terminar la E/S vuelve al final de la cola de listos', () => {
+    const simulador = crearSimulador(1000, 3);
+    simulador.registrarProceso(new Proceso(1, 100, 3, new EventoES(1, 2)));
+    simulador.registrarProceso(new Proceso(2, 100, 2));
+
+    for (let i = 0; i < 5; i++) simulador.ejecutarTick();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 2, 2, 1, 1]);
+    expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.TERMINADO);
   });
 });

@@ -10,6 +10,7 @@ export interface ISimulador {
   ejecutarTick(): void;
   obtenerPidsEsperandoMemoria(): number[];
   obtenerPidsListos(): number[];
+  obtenerPidsBloqueados(): number[];
   obtenerMapaMemoria(): InfoBloque[];
   obtenerHistorialCpu(): (number | null)[];
   obtenerCambiosContexto(): number;

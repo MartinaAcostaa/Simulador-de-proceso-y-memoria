@@ -3,12 +3,15 @@ import { IMemoria, InfoBloque } from '../interfaces/IMemoria';
 import { IPlanificador } from '../interfaces/IPlanificador';
 import { IProceso } from '../interfaces/IProceso';
 import { IMetricas } from '../interfaces/IMetricas';
+import { IGestorES } from '../interfaces/IGestorES';
+import { GestorES } from '../planificacion/GestorES';
 import { EstadoProceso } from '../procesos/EstadoProceso';
 import { Metricas } from './Metricas';
 
 export class Simulador implements ISimulador {
   private readonly _memoria: IMemoria;
   private readonly _planificador: IPlanificador;
+  private readonly _gestorES: IGestorES = new GestorES();
   private readonly _metricas: IMetricas = new Metricas();
   private readonly _procesos: IProceso[] = [];
   private readonly _historialCpu: (number | null)[] = [];
@@ -39,6 +42,7 @@ export class Simulador implements ISimulador {
 
   ejecutarTick(): void {
     this.admitirProcesos();
+    this.avanzarEntradaSalida();
     this._historialCpu.push(this.ejecutarCpu());
     this._reloj++;
   }
@@ -49,6 +53,10 @@ export class Simulador implements ISimulador {
 
   obtenerPidsListos(): number[] {
     return this._planificador.obtenerPidsListos();
+  }
+
+  obtenerPidsBloqueados(): number[] {
+    return this._gestorES.obtenerPidsBloqueados();
   }
 
   obtenerMapaMemoria(): InfoBloque[] {
@@ -78,6 +86,10 @@ export class Simulador implements ISimulador {
     }
   }
 
+  private avanzarEntradaSalida(): void {
+    this._gestorES.avanzarBloqueos().forEach((proceso) => this._planificador.agregarListo(proceso));
+  }
+
   private ejecutarCpu(): number | null {
     if (this._enCpu === null && this._planificador.hayListos()) {
       this.despacharSiguiente();
@@ -94,11 +106,20 @@ export class Simulador implements ISimulador {
   private resolverFinDeTick(proceso: IProceso): void {
     if (!proceso.necesitaCpu()) {
       this.terminarProceso(proceso);
+    } else if (proceso.debeBloquearse()) {
+      this.bloquearProceso(proceso);
     } else if (this._planificador.debeExpropiar(proceso)) {
       this.expropiarProceso(proceso);
     } else if (this._planificador.debeRenovarQuantum(proceso)) {
       proceso.renovarQuantum();
     }
+  }
+
+  private bloquearProceso(proceso: IProceso): void {
+    proceso.bloquear();
+    this._gestorES.agregarBloqueado(proceso);
+    this._metricas.registrarCambioContexto();
+    this._enCpu = null;
   }
 
   private expropiarProceso(proceso: IProceso): void {
