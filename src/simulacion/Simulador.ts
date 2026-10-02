@@ -8,6 +8,7 @@ export class Simulador implements ISimulador {
   private readonly _memoria: IMemoria;
   private readonly _planificador: IPlanificador;
   private readonly _procesos: IProceso[] = [];
+  private readonly _historialCpu: (number | null)[] = [];
   private _reloj = 0;
   private _enCpu: IProceso | null = null;
 
@@ -35,7 +36,7 @@ export class Simulador implements ISimulador {
 
   ejecutarTick(): void {
     this.admitirProcesos();
-    this.ejecutarCpu();
+    this._historialCpu.push(this.ejecutarCpu());
     this._reloj++;
   }
 
@@ -49,6 +50,10 @@ export class Simulador implements ISimulador {
 
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
+  }
+
+  obtenerHistorialCpu(): (number | null)[] {
+    return [...this._historialCpu];
   }
 
   private admitirProcesos(): void {
@@ -66,13 +71,29 @@ export class Simulador implements ISimulador {
     }
   }
 
-  private ejecutarCpu(): void {
+  private ejecutarCpu(): number | null {
     if (this._enCpu === null && this._planificador.hayListos()) {
       this.despacharSiguiente();
     }
-    if (this._enCpu !== null) {
-      this._enCpu.ejecutarTick();
+    const proceso = this._enCpu;
+    if (proceso === null) {
+      return null;
     }
+    proceso.ejecutarTick();
+    this.resolverFinDeTick(proceso);
+    return proceso.pid;
+  }
+
+  private resolverFinDeTick(proceso: IProceso): void {
+    if (!proceso.necesitaCpu()) {
+      this.terminarProceso(proceso);
+    }
+  }
+
+  private terminarProceso(proceso: IProceso): void {
+    proceso.terminar();
+    this._memoria.liberar(proceso.pid);
+    this._enCpu = null;
   }
 
   private despacharSiguiente(): void {

@@ -108,4 +108,28 @@ describe('Simulador - fase 3: CPU', () => {
     expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.EJECUTANDO);
     expect(simulador.obtenerPidsListos()).toEqual([2]);
   });
+  
+  it('al terminar su CPU pasa a TERMINADO y libera la CPU y la memoria', () => {
+    const simulador = crearSimulador(1000);
+    simulador.registrarProceso(new Proceso(1, 100, 2));
+
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+
+    expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.TERMINADO);
+    expect(simulador.pidEnCpu).toBeNull();
+    expect(simulador.obtenerMapaMemoria()).toEqual([{ inicio: 0, tamanio: 1000, pid: null }]);
+  });
+
+  it('guarda en el historial qué proceso usó la CPU en cada tick', () => {
+    const simulador = crearSimulador(1000);
+    simulador.registrarProceso(new Proceso(1, 600, 1));
+    simulador.registrarProceso(new Proceso(2, 600, 1));
+
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 2, null]);
+  });
 });
