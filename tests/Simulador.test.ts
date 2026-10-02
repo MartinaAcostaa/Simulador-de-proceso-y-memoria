@@ -208,3 +208,29 @@ describe('Simulador - fase 4: métricas y fin de la simulación', () => {
     expect(simulador.calcularFragmentacionExterna()).toBe(0);
   });
 });
+
+describe('Simulador - escenario completo', () => {
+  it('combina espera de memoria, fragmentación externa, E/S y Round-Robin', () => {
+    const simulador = crearSimulador(1000, 2);
+    simulador.registrarProceso(new Proceso(1, 400, 4, new EventoES(2, 2)));
+    simulador.registrarProceso(new Proceso(2, 300, 3));
+    simulador.registrarProceso(new Proceso(3, 500, 2));
+
+    for (let i = 0; i < 6; i++) simulador.ejecutarTick();
+
+    expect(simulador.obtenerPidsEsperandoMemoria()).toEqual([3]);
+    expect(simulador.obtenerMapaMemoria()).toEqual([
+      { inicio: 0, tamanio: 400, pid: null },
+      { inicio: 400, tamanio: 300, pid: 2 },
+      { inicio: 700, tamanio: 300, pid: null },
+    ]);
+    expect(simulador.calcularFragmentacionExterna()).toBeCloseTo(42.86, 2);
+
+    simulador.ejecutarHastaTerminar();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 2, 2, 1, 1, 2, 3, 3]);
+    expect(simulador.obtenerCambiosContexto()).toBe(2);
+    expect(simulador.calcularUsoCpu()).toBe(100);
+    expect(simulador.reloj).toBe(9);
+  });
+});
