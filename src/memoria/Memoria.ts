@@ -24,7 +24,25 @@ export class Memoria implements IMemoria {
     return this._estrategia.nombre;
   }
 
+  asignar(pid: number, tamanio: number): boolean {
+    const indice = this._estrategia.elegirBloque(this._bloques, tamanio);
+    if (indice === -1) {
+      return false;
+    }
+    this.ocuparBloque(indice, pid);
+    return true;
+  }
+
+  tieneAsignado(pid: number): boolean {
+    return this._bloques.some((bloque) => bloque.pid === pid);
+  }
+
   obtenerMapa(): InfoBloque[] {
     return this._bloques.map((bloque) => ({ inicio: bloque.inicio, tamanio: bloque.tamanio, pid: bloque.pid }));
+  }
+
+  private ocuparBloque(indice: number, pid: number): void {
+    const elegido = this._bloques[indice] as BloqueMemoria;
+    elegido.ocupar(pid);
   }
 }

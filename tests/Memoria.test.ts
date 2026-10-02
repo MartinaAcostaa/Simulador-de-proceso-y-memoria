@@ -30,4 +30,24 @@ describe('Memoria: creación (RF01)', () => {
 
     expect(memoria.obtenerMapa()).toHaveLength(1);
   });
+
+describe('Memoria: asignación (RF04)', () => {
+  it('asigna con ajuste exacto sin generar un bloque de tamaño 0', () => {
+    const memoria = new Memoria(300, new FirstFit());
+
+    expect(memoria.asignar(1, 300)).toBe(true);
+
+    expect(memoria.obtenerMapa()).toEqual([{ inicio: 0, tamanio: 300, pid: 1 }]);
+    expect(memoria.tieneAsignado(1)).toBe(true);
+  });
+
+  it('si no hay un hueco suficiente falla sin modificar los bloques', () => {
+    const memoria = new Memoria(300, new FirstFit());
+    const antes = memoria.obtenerMapa();
+
+    expect(memoria.asignar(2, 500)).toBe(false);
+    expect(memoria.obtenerMapa()).toEqual(antes);
+    expect(memoria.tieneAsignado(2)).toBe(false);
+  });
 });
+}); 

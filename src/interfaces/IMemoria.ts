@@ -9,4 +9,7 @@ export interface IMemoria {
   readonly nombreEstrategia: string;
 
   obtenerMapa(): InfoBloque[];
+  asignar(pid: number, tamanio: number): boolean;
+  tieneAsignado(pid: number): boolean;
 }
+
