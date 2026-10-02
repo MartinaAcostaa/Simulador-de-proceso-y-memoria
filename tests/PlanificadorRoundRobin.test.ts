@@ -22,6 +22,7 @@ describe('PlanificadorRoundRobin - creación', () => {
     expect(() => new PlanificadorRoundRobin(-1)).toThrow();
     expect(() => new PlanificadorRoundRobin(1.5)).toThrow();
   });
+  });
 
   describe('PlanificadorRoundRobin - agregar listos', () => {
   it('agrega los procesos al final de la cola (FIFO)', () => {
@@ -112,5 +113,4 @@ describe('PlanificadorRoundRobin - fin de quantum', () => {
     expect(planificador.debeExpropiar(enCpu)).toBe(false);
     expect(planificador.debeRenovarQuantum(enCpu)).toBe(true);
   });
-});
 });

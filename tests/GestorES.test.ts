@@ -36,6 +36,8 @@ describe('GestorES - bloqueados', () => {
 
     expect(() => gestor.agregarBloqueado(new Proceso(1, 100, 5))).toThrow();
   });
+  });
+
   describe('GestorES - avanzar bloqueos', () => {
   it('descuenta un tick de E/S a todos los bloqueados', () => {
     const gestor = new GestorES();
@@ -67,4 +69,3 @@ describe('GestorES - bloqueados', () => {
     expect(new GestorES().avanzarBloqueos()).toEqual([]);
   });
 });
-  });

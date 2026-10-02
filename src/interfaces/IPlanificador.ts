@@ -8,5 +8,4 @@ export interface IPlanificador {
   tomarSiguiente(): IProceso;
   debeExpropiar(proceso: IProceso): boolean;
   debeRenovarQuantum(proceso: IProceso): boolean;
-  avanzarBloqueos(): IProceso[];
 }
