@@ -9,6 +9,7 @@ export class Simulador implements ISimulador {
   private readonly _planificador: IPlanificador;
   private readonly _procesos: IProceso[] = [];
   private _reloj = 0;
+  private _enCpu: IProceso | null = null;
 
   constructor(memoria: IMemoria, planificador: IPlanificador) {
     this._memoria = memoria;
@@ -17,6 +18,10 @@ export class Simulador implements ISimulador {
 
   get reloj(): number {
     return this._reloj;
+  }
+
+  get pidEnCpu(): number | null {
+    return this._enCpu === null ? null : this._enCpu.pid;
   }
 
   registrarProceso(proceso: IProceso): void {
@@ -30,6 +35,7 @@ export class Simulador implements ISimulador {
 
   ejecutarTick(): void {
     this.admitirProcesos();
+    this.ejecutarCpu();
     this._reloj++;
   }
 
@@ -58,6 +64,21 @@ export class Simulador implements ISimulador {
     } else if (proceso.estado === EstadoProceso.NUEVO) {
       proceso.esperarMemoria();
     }
+  }
+
+  private ejecutarCpu(): void {
+    if (this._enCpu === null && this._planificador.hayListos()) {
+      this.despacharSiguiente();
+    }
+    if (this._enCpu !== null) {
+      this._enCpu.ejecutarTick();
+    }
+  }
+
+  private despacharSiguiente(): void {
+    const siguiente = this._planificador.tomarSiguiente();
+    siguiente.despachar();
+    this._enCpu = siguiente;
   }
 
   private filtrarPorEstado(estado: EstadoProceso): IProceso[] {

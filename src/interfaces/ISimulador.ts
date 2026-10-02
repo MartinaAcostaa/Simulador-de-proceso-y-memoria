@@ -4,6 +4,7 @@ import { EstadoProceso } from '../procesos/EstadoProceso';
 
 export interface ISimulador {
   readonly reloj: number;
+  readonly pidEnCpu: number | null;
   registrarProceso(proceso: IProceso): void;
   obtenerEstado(pid: number): EstadoProceso;
   ejecutarTick(): void;

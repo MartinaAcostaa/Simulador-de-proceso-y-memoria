@@ -95,3 +95,17 @@ describe('Simulador - fase 1: admisión', () => {
     expect(simulador.obtenerPidsEsperandoMemoria()).toEqual([2]);
   });
 });
+
+describe('Simulador - fase 3: CPU', () => {
+  it('despacha al primero de la cola y le da un tick de CPU', () => {
+    const simulador = crearSimulador();
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+    simulador.registrarProceso(new Proceso(2, 100, 3));
+
+    simulador.ejecutarTick();
+
+    expect(simulador.pidEnCpu).toBe(1);
+    expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.EJECUTANDO);
+    expect(simulador.obtenerPidsListos()).toEqual([2]);
+  });
+});
