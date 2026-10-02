@@ -1,5 +1,6 @@
 import { IProceso } from '../interfaces/IProceso';
 import { EstadoProceso } from './EstadoProceso';
+import { validarEnteroPositivo } from '../validaciones/validarEnteroPositivo';
 
 export class Proceso implements IProceso {
   private _pid: number;
@@ -10,9 +11,9 @@ export class Proceso implements IProceso {
   private _quantumConsumido: number;
 
   constructor(pid: number, memoriaRequerida: number, tiempoCpuTotal: number) {
-    this.validarEnteroPositivo(pid, 'PID');
-    this.validarEnteroPositivo(memoriaRequerida, 'Memoria requerida');
-    this.validarEnteroPositivo(tiempoCpuTotal, 'Tiempo de CPU total');
+    validarEnteroPositivo(pid, 'PID');
+    validarEnteroPositivo(memoriaRequerida, 'Memoria requerida');
+    validarEnteroPositivo(tiempoCpuTotal, 'Tiempo de CPU total');
 
     this._pid = pid;
     this._memoriaRequerida = memoriaRequerida;
@@ -51,7 +52,7 @@ export class Proceso implements IProceso {
   }
 
   agotoQuantum(quantum: number): boolean {
-    this.validarEnteroPositivo(quantum, 'Quantum');
+    validarEnteroPositivo(quantum, 'Quantum');
     return this._quantumConsumido >= quantum;
   }
 
@@ -97,13 +98,7 @@ export class Proceso implements IProceso {
     }
     this._estado = EstadoProceso.TERMINADO;
   }
-
-  private validarEnteroPositivo(valor: number, nombre: string): void {
-    if (!Number.isInteger(valor) || valor <= 0) {
-      throw new Error(`${nombre} debe ser un entero positivo`);
-    }
-  }
-
+  
   private validarEstado(permitidos: EstadoProceso[], accion: string): void {
     if (!permitidos.includes(this._estado)) {
       throw new Error(`No se puede ${accion} el proceso ${this._pid} en estado ${this._estado}`);
