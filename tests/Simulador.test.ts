@@ -66,4 +66,20 @@ describe('Simulador - fase 1: admisión', () => {
 
     expect(simulador.reloj).toBe(2);
   });
+  
+  it('asigna memoria en orden de registro y pasa los procesos a LISTO', () => {
+    const simulador = crearSimulador(1000);
+    simulador.registrarProceso(new Proceso(1, 300, 5));
+    simulador.registrarProceso(new Proceso(2, 200, 5));
+
+    simulador.ejecutarTick();
+
+    expect(simulador.obtenerEstado(2)).toBe(EstadoProceso.LISTO);
+    expect(simulador.obtenerPidsListos()).toContain(2);
+    expect(simulador.obtenerMapaMemoria()).toEqual([
+      { inicio: 0, tamanio: 300, pid: 1 },
+      { inicio: 300, tamanio: 200, pid: 2 },
+      { inicio: 500, tamanio: 500, pid: null },
+    ]);
+  });
 });

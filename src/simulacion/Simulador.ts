@@ -29,6 +29,7 @@ export class Simulador implements ISimulador {
   }
 
   ejecutarTick(): void {
+    this.admitirProcesos();
     this._reloj++;
   }
 
@@ -38,6 +39,19 @@ export class Simulador implements ISimulador {
 
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
+  }
+  
+  private admitirProcesos(): void {
+    this._procesos
+      .filter((p) => p.estado === EstadoProceso.NUEVO || p.estado === EstadoProceso.ESPERANDO_MEMORIA)
+      .forEach((proceso) => this.admitirProceso(proceso));
+  }
+
+  private admitirProceso(proceso: IProceso): void {
+    if (this._memoria.asignar(proceso.pid, proceso.memoriaRequerida)) {
+      proceso.admitir();
+      this._planificador.agregarListo(proceso);
+    }
   }
 
   private validarRegistro(proceso: IProceso): void {
