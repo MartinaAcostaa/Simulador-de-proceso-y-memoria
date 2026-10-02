@@ -1,6 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { Memoria } from '../src/memoria/Memoria';
 import { FirstFit } from '../src/memoria/FirstFit';
+import { BestFit } from '../src/memoria/BestFit';
+import { WorstFit } from '../src/memoria/WorstFit';
+import { IEstrategiaAsignacion } from '../src/interfaces/IEstrategiaAsignacion';
+
+function verificarInvariantes(memoria: Memoria): void {
+  let direccionEsperada = 0;
+  for (const bloque of memoria.obtenerMapa()) {
+    expect(bloque.inicio).toBe(direccionEsperada);
+    expect(bloque.tamanio).toBeGreaterThan(0);
+    direccionEsperada = bloque.inicio + bloque.tamanio;
+  }
+  expect(direccionEsperada).toBe(memoria.tamanioTotal);
+}
 
 describe('Memoria: creación (RF01)', () => {
   it('guarda el tamaño total y el nombre de la estrategia', () => {
@@ -15,7 +28,7 @@ describe('Memoria: creación (RF01)', () => {
     expect(() => new Memoria(-1024, new FirstFit())).toThrow();
     expect(() => new Memoria(10.5, new FirstFit())).toThrow();
   });
-  
+
   it('empieza con un único bloque libre del tamaño total', () => {
     const memoria = new Memoria(1024, new FirstFit());
 
@@ -30,6 +43,7 @@ describe('Memoria: creación (RF01)', () => {
 
     expect(memoria.obtenerMapa()).toHaveLength(1);
   });
+});
 
 describe('Memoria: asignación (RF04)', () => {
   it('asigna con ajuste exacto sin generar un bloque de tamaño 0', () => {
@@ -49,7 +63,7 @@ describe('Memoria: asignación (RF04)', () => {
     expect(memoria.obtenerMapa()).toEqual(antes);
     expect(memoria.tieneAsignado(2)).toBe(false);
   });
-  
+
   it('divide el bloque cuando sobra espacio', () => {
     const memoria = new Memoria(1024, new FirstFit());
 
@@ -73,6 +87,30 @@ describe('Memoria: asignación (RF04)', () => {
 
     expect(() => memoria.asignar(1, 0)).toThrow();
   });
+
+  const casos: [IEstrategiaAsignacion, number][] = [
+    [new FirstFit(), 0],
+    [new BestFit(), 300],
+    [new WorstFit(), 500],
+  ];
+
+  for (const [estrategia, inicioEsperado] of casos) {
+    it(`con ${estrategia.nombre} un proceso de 90 KB va a la dirección ${inicioEsperado}`, () => {
+      const memoria = new Memoria(1024, estrategia);
+      memoria.asignar(1, 200);
+      memoria.asignar(2, 100);
+      memoria.asignar(3, 100);
+      memoria.asignar(4, 100);
+      memoria.liberar(1);   
+      memoria.liberar(3);  
+
+      memoria.asignar(5, 90);
+
+      const bloqueP5 = memoria.obtenerMapa().find((bloque) => bloque.pid === 5);
+      expect(bloqueP5?.inicio).toBe(inicioEsperado);
+      verificarInvariantes(memoria);
+    });
+  }
 });
 
 describe('Memoria: liberación y coalescencia (RF05)', () => {
@@ -98,7 +136,7 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
 
     expect(() => memoria.liberar(9)).toThrow();
   });
-  
+
   it('fusiona con el vecino derecho libre', () => {
     const memoria = new Memoria(1024, new FirstFit());
     memoria.asignar(1, 100);
@@ -117,7 +155,7 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
     memoria.asignar(1, 100);
     memoria.asignar(2, 100);
     memoria.asignar(3, 100);
-    memoria.liberar(1);       
+    memoria.liberar(1);        
 
     memoria.liberar(2);
 
@@ -127,14 +165,14 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
       { inicio: 300, tamanio: 724, pid: null },
     ]);
   });
-  
+
   it('fusiona con los dos vecinos a la vez', () => {
     const memoria = new Memoria(1024, new FirstFit());
     memoria.asignar(1, 100);
     memoria.asignar(2, 100);
     memoria.asignar(3, 100);
-    memoria.liberar(1);       
-    memoria.liberar(3);      
+    memoria.liberar(1);        
+    memoria.liberar(3);       
 
     memoria.liberar(2);
 
@@ -146,7 +184,7 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
     memoria.asignar(1, 300);
     memoria.asignar(2, 200);
     memoria.asignar(3, 524);
-    expect(memoria.asignar(4, 100)).toBe(false);  
+    expect(memoria.asignar(4, 100)).toBe(false);   
 
     memoria.liberar(2);
     memoria.liberar(1);
@@ -156,4 +194,3 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
     expect(memoria.asignar(4, 100)).toBe(true);
   });
 });
-}); 
