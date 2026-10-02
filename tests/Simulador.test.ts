@@ -3,6 +3,8 @@ import { Simulador } from '../src/simulacion/Simulador';
 import { Memoria } from '../src/memoria/Memoria';
 import { FirstFit } from '../src/memoria/FirstFit';
 import { PlanificadorRoundRobin } from '../src/planificacion/PlanificadorRoundRobin';
+import { Proceso } from '../src/procesos/Proceso';
+import { EstadoProceso } from '../src/procesos/EstadoProceso';
 
 function crearSimulador(memoria = 1000, quantum = 2): Simulador {
   return new Simulador(new Memoria(memoria, new FirstFit()), new PlanificadorRoundRobin(quantum));
@@ -14,5 +16,21 @@ describe('Simulador - creación', () => {
 
     expect(simulador.obtenerPidsListos()).toEqual([]);
     expect(simulador.obtenerMapaMemoria()).toEqual([{ inicio: 0, tamanio: 1000, pid: null }]);
+  });
+});
+
+describe('Simulador - registro de procesos', () => {
+  it('registra un proceso, que queda en estado NUEVO', () => {
+    const simulador = crearSimulador();
+
+    simulador.registrarProceso(new Proceso(1, 100, 5));
+
+    expect(simulador.obtenerEstado(1)).toBe(EstadoProceso.NUEVO);
+  });
+
+  it('da error al consultar un PID que no está registrado', () => {
+    const simulador = crearSimulador();
+
+    expect(() => simulador.obtenerEstado(99)).toThrow();
   });
 });
