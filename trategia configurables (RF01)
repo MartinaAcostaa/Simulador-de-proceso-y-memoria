@@ -1,0 +1,32 @@
+ coverage/base.css                                  | 362 [32m++++++++[m
+ coverage/block-navigation.js                       |  82 [32m++[m
+ coverage/favicon.png                               | Bin [31m0[m -> [32m445[m bytes
+ coverage/index.html                                | 161 [32m++++[m
+ coverage/interfaces/IBloqueMemoria.ts.html         | 115 [32m+++[m
+ coverage/interfaces/IEstrategiaAsignacion.ts.html  | 106 [32m+++[m
+ coverage/interfaces/IEventoES.ts.html              |  94 [32m+++[m
+ coverage/interfaces/IMemoria.ts.html               | 145 [32m++++[m
+ coverage/interfaces/IProceso.ts.html               | 163 [32m++++[m
+ coverage/interfaces/index.html                     | 176 [32m++++[m
+ coverage/memoria/BestFit.ts.html                   | 112 [32m+++[m
+ coverage/memoria/BloqueMemoria.ts.html             | 256 [32m++++++[m
+ coverage/memoria/EstrategiaPorComparacion.ts.html  | 154 [32m++++[m
+ coverage/memoria/FirstFit.ts.html                  | 118 [32m+++[m
+ coverage/memoria/Memoria.ts.html                   | 430 [32m++++++++++[m
+ coverage/memoria/WorstFit.ts.html                  | 112 [32m+++[m
+ coverage/memoria/index.html                        | 191 [32m+++++[m
+ coverage/prettify.css                              | 101 [32m+++[m
+ coverage/prettify.js                               | 937 [32m+++++++++++++++++++++[m
+ coverage/procesos/EstadoProceso.ts.html            | 106 [32m+++[m
+ coverage/procesos/EventoES.ts.html                 | 151 [32m++++[m
+ coverage/procesos/Proceso.ts.html                  | 550 [32m++++++++++++[m
+ coverage/procesos/index.html                       | 146 [32m++++[m
+ coverage/sort-arrow-sprite.png                     | Bin [31m0[m -> [32m138[m bytes
+ coverage/sorter.js                                 | 205 [32m+++++[m
+ coverage/validaciones/index.html                   | 116 [32m+++[m
+ .../validaciones/validarEnteroPositivo.ts.html     |  97 [32m+++[m
+ .../results.json                                   |   2 [32m+[m[31m-[m
+ src/interfaces/IMemoria.ts                         |   4 [32m+[m
+ src/memoria/Memoria.ts                             |  23 [32m+[m
+ tests/Memoria.test.ts                              |  18 [32m+[m
+ 31 files changed, 5232 insertions(+), 1 deletion(-)

@@ -15,4 +15,19 @@ describe('Memoria: creación (RF01)', () => {
     expect(() => new Memoria(-1024, new FirstFit())).toThrow();
     expect(() => new Memoria(10.5, new FirstFit())).toThrow();
   });
+  
+  it('empieza con un único bloque libre del tamaño total', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+
+    expect(memoria.obtenerMapa()).toEqual([{ inicio: 0, tamanio: 1024, pid: null }]);
+  });
+
+  it('el mapa es una copia: modificarlo no altera la memoria', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    const mapa = memoria.obtenerMapa();
+
+    mapa.push({ inicio: 999, tamanio: 1, pid: 7 });
+
+    expect(memoria.obtenerMapa()).toHaveLength(1);
+  });
 });
