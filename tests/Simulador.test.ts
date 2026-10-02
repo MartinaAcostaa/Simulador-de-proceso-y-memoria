@@ -33,4 +33,25 @@ describe('Simulador - registro de procesos', () => {
 
     expect(() => simulador.obtenerEstado(99)).toThrow();
   });
+
+    it('no acepta dos procesos con el mismo PID', () => {
+    const simulador = crearSimulador();
+    simulador.registrarProceso(new Proceso(1, 100, 5));
+
+    expect(() => simulador.registrarProceso(new Proceso(1, 200, 3))).toThrow();
+  });
+
+  it('no acepta un proceso que pide más memoria que el total', () => {
+    const simulador = crearSimulador(1000);
+
+    expect(() => simulador.registrarProceso(new Proceso(1, 1001, 5))).toThrow();
+  });
+
+  it('no acepta un proceso que no esté en estado NUEVO', () => {
+    const simulador = crearSimulador();
+    const proceso = new Proceso(1, 100, 5);
+    proceso.admitir();
+
+    expect(() => simulador.registrarProceso(proceso)).toThrow();
+  });
 });

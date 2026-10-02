@@ -15,6 +15,7 @@ export class Simulador implements ISimulador {
   }
 
   registrarProceso(proceso: IProceso): void {
+    this.validarRegistro(proceso);
     this._procesos.push(proceso);
   }
 
@@ -28,6 +29,17 @@ export class Simulador implements ISimulador {
 
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
+  }
+  private validarRegistro(proceso: IProceso): void {
+    if (proceso.estado !== EstadoProceso.NUEVO) {
+      throw new Error(`El proceso ${proceso.pid} tiene que estar en estado NUEVO`);
+    }
+    if (this._procesos.some((p) => p.pid === proceso.pid)) {
+      throw new Error(`Ya hay un proceso registrado con PID ${proceso.pid}`);
+    }
+    if (proceso.memoriaRequerida > this._memoria.tamanioTotal) {
+      throw new Error(`El proceso ${proceso.pid} pide más memoria que la total`);
+    }
   }
 
   private buscarProceso(pid: number): IProceso {
