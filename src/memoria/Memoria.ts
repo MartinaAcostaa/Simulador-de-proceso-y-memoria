@@ -13,7 +13,7 @@ export class Memoria implements IMemoria {
 
     this._tamanioTotal = tamanioTotal;
     this._estrategia = estrategia;
-    this._bloques = [new BloqueMemoria(0, tamanioTotal)];  
+    this._bloques = [new BloqueMemoria(0, tamanioTotal)];   
   }
 
   get tamanioTotal(): number {
@@ -55,10 +55,22 @@ export class Memoria implements IMemoria {
     return this._bloques.map((bloque) => ({ inicio: bloque.inicio, tamanio: bloque.tamanio, pid: bloque.pid }));
   }
 
+  calcularMemoriaLibre(): number {
+    return this.obtenerBloquesLibres().reduce((suma, bloque) => suma + bloque.tamanio, 0);
+  }
+
+  calcularMemoriaOcupada(): number {
+    return this._tamanioTotal - this.calcularMemoriaLibre();
+  }
+
+  calcularOcupacion(): number {
+    return (100 * this.calcularMemoriaOcupada()) / this._tamanioTotal;
+  }
+
   private ocuparBloque(indice: number, pid: number, tamanio: number): void {
     const elegido = this._bloques[indice] as BloqueMemoria;
     if (elegido.tamanio === tamanio) {
-      elegido.ocupar(pid);  
+      elegido.ocupar(pid);   
       return;
     }
     const ocupado = new BloqueMemoria(elegido.inicio, tamanio);
@@ -66,7 +78,7 @@ export class Memoria implements IMemoria {
     const resto = new BloqueMemoria(elegido.inicio + tamanio, elegido.tamanio - tamanio);
     this._bloques.splice(indice, 1, ocupado, resto);
   }
-  
+
   private coalescer(indice: number): void {
     const derecho = this._bloques[indice + 1];
     if (derecho !== undefined && derecho.estaLibre()) {
@@ -83,5 +95,9 @@ export class Memoria implements IMemoria {
     const segundo = this._bloques[indice + 1] as BloqueMemoria;
     const fusionado = new BloqueMemoria(primero.inicio, primero.tamanio + segundo.tamanio);
     this._bloques.splice(indice, 2, fusionado);
+  }
+
+  private obtenerBloquesLibres(): BloqueMemoria[] {
+    return this._bloques.filter((bloque) => bloque.estaLibre());
   }
 }

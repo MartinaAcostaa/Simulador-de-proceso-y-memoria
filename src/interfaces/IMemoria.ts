@@ -9,8 +9,12 @@ export interface IMemoria {
   readonly nombreEstrategia: string;
 
   obtenerMapa(): InfoBloque[];
+
   asignar(pid: number, tamanio: number): boolean;
   tieneAsignado(pid: number): boolean;
   liberar(pid: number): void;
-}
 
+  calcularMemoriaLibre(): number;
+  calcularMemoriaOcupada(): number;
+  calcularOcupacion(): number;
+}

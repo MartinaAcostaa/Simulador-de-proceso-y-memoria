@@ -193,4 +193,22 @@ describe('Memoria: liberación y coalescencia (RF05)', () => {
     expect(memoria.obtenerMapa()).toEqual([{ inicio: 0, tamanio: 1024, pid: null }]);
     expect(memoria.asignar(4, 100)).toBe(true);
   });
+  
+describe('Memoria: métricas (RF09)', () => {
+  it('memoria vacía: todo libre y ocupación 0%', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+
+    expect(memoria.calcularMemoriaLibre()).toBe(1024);
+    expect(memoria.calcularMemoriaOcupada()).toBe(0);
+    expect(memoria.calcularOcupacion()).toBe(0);
+  });
+
+  it('memoria llena: libre 0 y ocupación 100%', () => {
+    const memoria = new Memoria(1024, new FirstFit());
+    memoria.asignar(1, 1024);
+
+    expect(memoria.calcularMemoriaLibre()).toBe(0);
+    expect(memoria.calcularOcupacion()).toBe(100);
+  });
+});
 });
