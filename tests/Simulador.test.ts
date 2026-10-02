@@ -55,3 +55,15 @@ describe('Simulador - registro de procesos', () => {
     expect(() => simulador.registrarProceso(proceso)).toThrow();
   });
 });
+
+describe('Simulador - fase 1: admisión', () => {
+  it('cada tick avanza el reloj en uno', () => {
+    const simulador = crearSimulador();
+    expect(simulador.reloj).toBe(0);
+
+    simulador.ejecutarTick();
+    simulador.ejecutarTick();
+
+    expect(simulador.reloj).toBe(2);
+  });
+});

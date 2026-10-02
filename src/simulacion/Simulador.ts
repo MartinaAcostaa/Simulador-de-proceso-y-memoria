@@ -8,10 +8,15 @@ export class Simulador implements ISimulador {
   private readonly _memoria: IMemoria;
   private readonly _planificador: IPlanificador;
   private readonly _procesos: IProceso[] = [];
+  private _reloj = 0;
 
   constructor(memoria: IMemoria, planificador: IPlanificador) {
     this._memoria = memoria;
     this._planificador = planificador;
+  }
+
+  get reloj(): number {
+    return this._reloj;
   }
 
   registrarProceso(proceso: IProceso): void {
@@ -21,6 +26,10 @@ export class Simulador implements ISimulador {
 
   obtenerEstado(pid: number): EstadoProceso {
     return this.buscarProceso(pid).estado;
+  }
+
+  ejecutarTick(): void {
+    this._reloj++;
   }
 
   obtenerPidsListos(): number[] {
