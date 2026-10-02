@@ -18,4 +18,15 @@ export class GestorES implements IGestorES {
     }
     this._bloqueados.push(proceso);
   }
+    avanzarBloqueos(): IProceso[] {
+    this._bloqueados.forEach((proceso) => proceso.avanzarBloqueo());
+    const terminados = this._bloqueados.filter((proceso) => proceso.bloqueoRestante === 0);
+    terminados.forEach((proceso) => this.sacarDeBloqueados(proceso));
+    return terminados;
+  }
+
+  private sacarDeBloqueados(proceso: IProceso): void {
+    proceso.desbloquear();
+    this._bloqueados.splice(this._bloqueados.indexOf(proceso), 1);
+  }
 }

@@ -85,7 +85,7 @@ describe('PlanificadorRoundRobin - fin de quantum', () => {
     for (let i = 0; i < ticks; i++) proceso.ejecutarTick();
     return proceso;
   }
-  
+
 
   it('si no agotó el quantum, no expropia ni renueva', () => {
     const planificador = new PlanificadorRoundRobin(2);
