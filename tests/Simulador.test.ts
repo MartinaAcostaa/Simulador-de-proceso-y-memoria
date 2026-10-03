@@ -168,7 +168,6 @@ describe('Simulador - Round-Robin', () => {
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 1]);
     expect(simulador.obtenerCambiosContexto()).toBe(0);
   });
-});
 
 describe('Simulador - fase 2: Entrada/Salida', () => {
   it('bloquea al proceso en su E/S, conserva su memoria y cuenta un cambio de contexto', () => {
