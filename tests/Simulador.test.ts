@@ -221,6 +221,21 @@ describe('Simulador - fase 4: métricas y fin de la simulación', () => {
   });
 });
 
+describe('Simulador - consulta del estado (RF10)', () => {
+  it('devuelve los PID de los procesos terminados, en orden de registro', () => {
+    const simulador = crearSimulador(1000, 2);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+    simulador.registrarProceso(new Proceso(2, 100, 2));
+    expect(simulador.obtenerPidsTerminados()).toEqual([]);
+
+    for (let i = 0; i < 4; i++) simulador.ejecutarTick();
+    expect(simulador.obtenerPidsTerminados()).toEqual([2]);
+
+    simulador.ejecutarTick();
+    expect(simulador.obtenerPidsTerminados()).toEqual([1, 2]);
+  });
+});
+
 describe('Simulador - escenario completo', () => {
   it('combina espera de memoria, fragmentación externa, E/S y Round-Robin', () => {
     const simulador = crearSimulador(1000, 2);
