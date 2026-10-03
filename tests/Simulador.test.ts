@@ -146,6 +146,18 @@ describe('Simulador - Round-Robin', () => {
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 2, 2, 1, 2]);
     expect(simulador.obtenerCambiosContexto()).toBe(2);
   });
+  
+  it('caso mínimo de la consigna: Q = 2, P1 con CPU 3 y P2 con CPU 2 ejecutan P1, P1, P2, P2, P1', () => {
+    const simulador = crearSimulador(1000, 2);
+    simulador.registrarProceso(new Proceso(1, 100, 3));
+    simulador.registrarProceso(new Proceso(2, 100, 2));
+
+    simulador.ejecutarHastaTerminar();
+
+    expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 2, 2, 1]);
+    expect(simulador.obtenerCambiosContexto()).toBe(1);
+  });
+  });
 
   it('al agotar el quantum sin otros listos, renueva sin cambio de contexto', () => {
     const simulador = crearSimulador(1000, 1);
