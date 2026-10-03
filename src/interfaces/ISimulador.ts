@@ -13,6 +13,7 @@ export interface ISimulador {
   obtenerPidsEsperandoMemoria(): number[];
   obtenerPidsListos(): number[];
   obtenerPidsBloqueados(): number[];
+  obtenerPidsTerminados(): number[];
   obtenerMapaMemoria(): InfoBloque[];
   obtenerHistorialCpu(): (number | null)[];
   obtenerCambiosContexto(): number;

@@ -71,6 +71,10 @@ export class Simulador implements ISimulador {
     return this._gestorES.obtenerPidsBloqueados();
   }
 
+  obtenerPidsTerminados(): number[] {
+    return this.filtrarPorEstado(EstadoProceso.TERMINADO).map((p) => p.pid);
+  }
+
   obtenerMapaMemoria(): InfoBloque[] {
     return this._memoria.obtenerMapa();
   }
