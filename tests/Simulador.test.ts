@@ -157,7 +157,6 @@ describe('Simulador - Round-Robin', () => {
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 2, 2, 1]);
     expect(simulador.obtenerCambiosContexto()).toBe(1);
   });
-  });
 
   it('al agotar el quantum sin otros listos, renueva sin cambio de contexto', () => {
     const simulador = crearSimulador(1000, 1);
@@ -167,6 +166,7 @@ describe('Simulador - Round-Robin', () => {
 
     expect(simulador.obtenerHistorialCpu()).toEqual([1, 1, 1]);
     expect(simulador.obtenerCambiosContexto()).toBe(0);
+  });
   });
 
 describe('Simulador - fase 2: Entrada/Salida', () => {

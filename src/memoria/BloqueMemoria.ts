@@ -25,7 +25,6 @@ export class BloqueMemoria implements IBloqueMemoria {
     return this._tamanio;
   }
 
-  // Primera dirección DESPUÉS del bloque (fin exclusivo)
   get fin(): number {
     return this._inicio + this._tamanio;
   }
@@ -34,12 +33,10 @@ export class BloqueMemoria implements IBloqueMemoria {
     return this._pid;
   }
 
-  // ¿Está disponible para asignar?
   estaLibre(): boolean {
     return this._pid === null;
   }
 
-  // Libre → ocupado por el proceso pid
   ocupar(pid: number): void {
     validarEnteroPositivo(pid, 'El PID');
     if (!this.estaLibre()) {
@@ -48,7 +45,6 @@ export class BloqueMemoria implements IBloqueMemoria {
     this._pid = pid;
   }
 
-  // Ocupado → libre
   liberar(): void {
     if (this.estaLibre()) {
       throw new Error(`El bloque en ${this._inicio} ya está libre`);
